@@ -1,17 +1,18 @@
 #include "history.h"
 #include "commands.h"
+#include "definitions.h"
+#include "directory.h"
+#include "exit.h"
+
 #include <stdio.h>
 #include <string.h>
-
-#define MAX_INPUT_SIZE 1024
-#define MAX_ARG_SIZE 100
 
 int main() {
     char input[MAX_INPUT_SIZE];
     char *tokens[MAX_ARG_SIZE];
 
     while (1) {
-        printf("myshell> ");
+        printf(DEF_SHELL_PROMPT);
         if (fgets(input, sizeof(input), stdin) == NULL) {
             continue; // Handle EOF
         }

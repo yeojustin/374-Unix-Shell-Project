@@ -1,8 +1,7 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-// History buffer size
-#define HISTORY_SIZE 10
+#include "definitions.h"
 
 extern char *history[HISTORY_SIZE];
 extern int history_count;
