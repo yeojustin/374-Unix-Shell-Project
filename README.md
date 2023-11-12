@@ -15,6 +15,7 @@
 | Complex command lines with mixture of separators |               | ✅                     |
 | Handling of slow system calls               |                     | ✅                     |
 
+<br>
 
 Fixes and additions from 'main' branch
 1. compelete overhaul because execution does not seaprate tokens and handle complex mixtures
