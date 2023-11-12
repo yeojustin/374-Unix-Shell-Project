@@ -1,26 +1,19 @@
 CC = gcc
-CFLAGS = -Wall -g 
-HEADERS = commands.h history.h exit.h definitions.h directory.h
-SOURCES = main.c history.c commands.c exit.c
-OBJ = main.o commands.o history.o exit.o directory.o
+CFLAGS = -Wall -Wextra -g
 
-myshell: $(OBJ)
-	$(CC) $(CFLAGS) -o myshell $(OBJ)
+all: shell
 
-main.o: main.c $(HEADERS)
+shell: main.o command.o shell.o
+	$(CC) $(CFLAGS) -o shell main.o command.o shell.o -lm
+
+main.o: main.c shell.h command.h
 	$(CC) $(CFLAGS) -c main.c
 
-commands.o: commands.c commands.h
-	$(CC) $(CFLAGS) -c commands.c
+command.o: command.c command.h
+	$(CC) $(CFLAGS) -c command.c
 
-history.o: history.c history.h
-	$(CC) $(CFLAGS) -c history.c
-
-exit.o: exit.c exit.h
-	$(CC) $(CFLAGS) -c exit.c
-
-directory.o: directory.c directory.h
-	$(CC) $(CFLAGS) -c directory.c
+shell.o: shell.c shell.h command.h
+	$(CC) $(CFLAGS) -c shell.c
 
 clean:
-	rm -f $(OBJ) myshell
+	rm -f shell *.o
