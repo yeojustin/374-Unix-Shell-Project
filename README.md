@@ -24,7 +24,7 @@ Fixes and additions from 'main' branch
 4. fix wildcard exact '?' and integrated it into inital wildcard all '*'
 5. ALL other requirments as per assignment (see check list)
 
-###TODOs: 
+<br>TODOs</br>: 
 1. testcases (do as you go)
 - suggest creating a c source file
 - create multiple block of functions then create a command ie. % testshell to run the functions
