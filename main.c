@@ -27,7 +27,7 @@ int main()
         {
             toggleSignalBlock(SIG_BLOCK, SIGCHLD);
 
-            handleCommandLine(input, 0, 0, 0, commandArray);
+            processCommandLine(input, 0, 0, 0, commandArray);
             executeCommands(commandArray);
             freeCommands(commandArray);
 

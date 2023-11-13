@@ -7,48 +7,47 @@ char *promptName = "%";
 Command *commandArray[MAX_COMMANDS];
 char *input;
 
-
 int setRedirection(Command *command)
 {
-    char *fileName = NULL;
-    int descriptor = command->redirection;
-    int file;
+    int fileDescriptor = -1;
 
-    if (descriptor == 0)
+    // Set up redirection for stdin
+    if (command->redirection == 0 && command->stdin != NULL)
     {
-        fileName = command->stdin;
-        file = open(fileName, O_RDONLY);
-    }
-    else if (descriptor == 1)
-    {
-        fileName = command->stdout;
-        file = open(fileName, O_WRONLY | O_CREAT, 0766);
-    }
-    else if (descriptor == 2)
-    {
-        fileName = command->stderr;
-        file = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0766);
-    }
-    else
-    {
-        return 1;
+        fileDescriptor = open(command->stdin, O_RDONLY);
+        if (fileDescriptor < 0)
+        {
+            perror("Error opening file for stdin redirection");
+            return -1; // Return error code instead of exiting
+        }
+        dup2(fileDescriptor, STDIN_FILENO);
+        close(fileDescriptor);
     }
 
-    // Check if file open successfully
-    if (file < 0)
+    // Set up redirection for stdout
+    if (command->redirection == 1 && command->stdout != NULL)
     {
-        perror("Error opening file");
-        exit(1);
-    }
-    else
-    {
-        dup2(file, descriptor);
-        close(file);
+        fileDescriptor = open(command->stdout, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if (fileDescriptor < 0)
+        {
+            perror("Error opening file for stdout redirection");
+            return -1; // Return error code instead of exiting
+        }
+        dup2(fileDescriptor, STDOUT_FILENO);
+        close(fileDescriptor);
     }
 
-    if (fileName != NULL)
+    // Set up redirection for stderr
+    if (command->redirection == 2 && command->stderr != NULL)
     {
-        free(fileName);
+        fileDescriptor = open(command->stderr, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if (fileDescriptor < 0)
+        {
+            perror("Error opening file for stderr redirection");
+            return -1; // Return error code instead of exiting
+        }
+        dup2(fileDescriptor, STDERR_FILENO);
+        close(fileDescriptor);
     }
 
     return 0;
@@ -79,6 +78,7 @@ void handleSignals(int signalNumber)
     }
 }
 
+// fix exit from bg task ie top command
 int setupSignals()
 {
     struct sigaction act;
@@ -168,7 +168,7 @@ void executeCommands(Command **commands)
 
     while ((command = commands[index++]) != NULL)
     {
-        if (strcmp(command->name, CHANGE_DIR) == 0)
+        if (strcmp(command->name, COMMAND_CHANGE_DIR) == 0)
         {
             input = command->argv[1];
             if (input != NULL)
@@ -193,13 +193,13 @@ void executeCommands(Command **commands)
         {
             exit(0);
         }
-        else if (strcmp(command->name, PRINT_DIR) == 0)
+        else if (strcmp(command->name, COMMAND_PRINT_DIR) == 0)
         {
             char currentDir[1024];
             getcwd(currentDir, 1024);
             printf("%s\n", currentDir);
         }
-        else if (strcmp(command->name, PROMPT) == 0)
+        else if (strcmp(command->name, COMMAND_PROMPT) == 0)
         {
             input = command->argv[1];
             if (input != NULL && strlen(input) > 0)
@@ -219,7 +219,7 @@ void executeCommands(Command **commands)
                 if (pipeCount > 0)
                 {
                     pipedCommands[pipeCount++] = command;
-                    createPipedProcesses(pipedCommands, pipeCount);
+                    makePipedProcesses(pipedCommands, pipeCount);
 
                     for (int i = 0; i < pipeCount; i++)
                     {
@@ -230,7 +230,7 @@ void executeCommands(Command **commands)
                 }
                 else
                 {
-                    createProcess(command);
+                    makePipedProcesses(command);
                 }
             }
         }
@@ -239,7 +239,7 @@ void executeCommands(Command **commands)
     free(command);
 }
 
-void createPipedProcesses(Command **pipedCommands, int count)
+void makePipedProcesses(Command **pipedCommands, int count)
 {
     pid_t pid;
     int i, j;
@@ -322,7 +322,7 @@ void createPipedProcesses(Command **pipedCommands, int count)
     }
 }
 
-void createProcess(Command *command)
+void makeProcess(Command *command)
 {
     pid_t pid;
     int status;
@@ -353,7 +353,6 @@ void createProcess(Command *command)
         waitpid(pid, &status, 0);
     }
 }
-
 
 /*
 int redirection(Command *command)
@@ -396,6 +395,56 @@ int redirection(Command *command)
         }
         dup2(stderrFd, STDERR_FILENO);
         close(stderrFd);
+    }
+
+    return 0;
+}
+*/
+
+
+
+/* 
+int setRedirection(Command *command)
+{
+    char *fileName = NULL;
+    int descriptor = command->redirection;
+    int file;
+
+    if (descriptor == 0)
+    {
+        fileName = command->stdin;
+        file = open(fileName, O_RDONLY);
+    }
+    else if (descriptor == 1)
+    {
+        fileName = command->stdout;
+        file = open(fileName, O_WRONLY | O_CREAT, 0666);
+    }
+    else if (descriptor == 2)
+    {
+        fileName = command->stderr;
+        file = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    }
+    else
+    {
+        return 1;
+    }
+
+    // Check if file open successfully
+    if (file < 0)
+    {
+        perror("Error opening file");
+        exit(1);
+    }
+    else
+    {
+        dup2(file, descriptor);
+        close(file);
+    }
+
+    if (fileName != NULL)
+    {
+        free(fileName);
     }
 
     return 0;

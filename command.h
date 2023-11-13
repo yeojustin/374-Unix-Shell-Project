@@ -9,18 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SEPARATOR_CONCURRENT "&"
-#define SEPARATOR_INPUT "<"
-#define SEPARATOR_OUTPUT ">"
-#define SEPARATOR_ERROR "2>"
-#define SEPARATOR_PIPE "|"
-#define SEPARATOR_SEQUENTIAL ";"
-#define WILDCARD_ALL '*'
-#define WILDCARD_EXACT '?'
-#define MAX_COMMANDS 100
-#define MAX_ARGUMENTS 1000
+#include "definitions.h"
 
-static const char whiteSpace[2] = {(char)0x20, (char)0x09};
+// static const char WHITE_SPACE[2] = {(char)0x20, (char)0x09};
 
 typedef struct CommandStruct
 {
@@ -36,6 +27,6 @@ typedef struct CommandStruct
 } Command;
 
 Command *createCommand(char *input, int background, int pipe);
-int getArguments(char *input, Command *command);
+int getArgs(char *input, Command *command);
 char *getSeparator(char *input);
-void handleCommandLine(char *input, int background, int pipe, int iteration, Command **commands);
+void processCommandLine(char *input, int background, int pipe, int iteration, Command **commands);processCommand

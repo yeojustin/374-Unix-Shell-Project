@@ -3,14 +3,14 @@
 #include "command.h"
 
 // Function to extract arguments from the input and populate the Command structure
-int getArguments(char *input, Command *command)
+int getArgs(char *input, Command *command)
 {
   char *token = NULL;
   int argumentCount = 0;
 
-  // Tokenize the input using whiteSpace as the delimiter
+  // Tokenize the input using white space as the delimiter
   char *saveptr;
-  token = strtok_r(input, whiteSpace, &saveptr);
+  token = strtok_r(input, WHITE_SPACE, &saveptr);
 
   // Process each token
   while (token != NULL)
@@ -38,7 +38,7 @@ int getArguments(char *input, Command *command)
     }
 
     // Move to the next token
-    token = strtok_r(NULL, whiteSpace, &saveptr);
+    token = strtok_r(NULL, WHITE_SPACE, &saveptr);
   }
 
   return argumentCount;
@@ -101,7 +101,7 @@ Command *createCommand(char *input, int background, int pipe)
   }
 
   // Get arguments and populate the command structure
-  command->argc = getArguments(input, command);
+  command->argc = getArgs(input, command);
   command->name = command->argv[0];
   command->background = background;
   command->pipe = pipe;
@@ -118,7 +118,7 @@ Command *createCommand(char *input, int background, int pipe)
   }
 }
 
-void handleCommandLine(char *input, int background, int pipe, int iteration, Command **commands)
+void processCommandLine(char *input, int background, int pipe, int iteration, Command **commands)
 {
   int isBackground = 0;
   int isPipe = 0;
@@ -146,7 +146,7 @@ void handleCommandLine(char *input, int background, int pipe, int iteration, Com
       isPipe = commandCount + 1;
     }
 
-    handleCommandLine(input, isBackground, isPipe, 1, commands);
+    processCommandLine(input, isBackground, isPipe, 1, commands);
   }
   else
   {
@@ -156,7 +156,7 @@ void handleCommandLine(char *input, int background, int pipe, int iteration, Com
 
   if (token != NULL)
   {
-    handleCommandLine(token, background, pipe, 1, commands);
+    processCommandLine(token, background, pipe, 1, commands);
   }
 }
 
