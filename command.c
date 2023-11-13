@@ -22,7 +22,7 @@ int getArguments(char *input, Command *command)
       glob(token, 0, NULL, &result);
 
       // Copy each expanded path to the command arguments
-      for (int i = 0; i < result.gl_pathc; i++)
+      for (size_t i = 0; i < result.gl_pathc; i++)
       {
         command->argv[argumentCount] = strdup(result.gl_pathv[i]);
         argumentCount++;

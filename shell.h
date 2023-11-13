@@ -10,6 +10,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <wordexp.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
 
 #include "command.h"
 
@@ -18,6 +21,7 @@
 #define PRINT_DIR "pwd"
 #define PROMPT "prompt"
 #define EXIT "exit"
+#define HISTORY "history"
 
 extern char *promptName;
 extern Command *commandArray[MAX_COMMANDS];
@@ -26,6 +30,7 @@ extern char *input;
 int redirection(Command *command);
 void collectChildren();
 void handleSignals();
+void display_history();
 int setupSignals();
 int toggleSignalBlock(int flag, int signalNumber);
 void freeCommands(Command **commands);

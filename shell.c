@@ -79,6 +79,15 @@ void handleSignals(int signalNumber)
     }
 }
 
+void display_history() {
+    HIST_ENTRY **the_history_list = history_list();
+    if (the_history_list) {
+        for (int i = 0; the_history_list[i]; i++) {
+            printf("%d: %s\n", i + 1, the_history_list[i]->line);
+        }
+    }
+}
+
 int setupSignals()
 {
     struct sigaction act;
@@ -168,6 +177,11 @@ void executeCommands(Command **commands)
 
     while ((command = commands[index++]) != NULL)
     {
+    
+    	if (strcmp(command->name, HISTORY) == 0) {
+            display_history();
+            continue;
+        }
         if (strcmp(command->name, CHANGE_DIR) == 0)
         {
             input = command->argv[1];
