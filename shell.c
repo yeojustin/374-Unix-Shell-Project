@@ -8,49 +8,42 @@ Command *commandArray[MAX_COMMANDS];
 char *input;
 
 
-int setRedirection(Command *command)
-{
-    char *fileName = NULL;
-    int descriptor = command->redirection;
-    int file;
-
-    if (descriptor == 0)
-    {
-        fileName = command->stdin;
-        file = open(fileName, O_RDONLY);
+int setRedirection(Command *command) {
+    int fileDescriptor = -1;
+ 
+    // Set up redirection for stdin
+    if (command->redirection == 0 && command->stdin != NULL) {
+        fileDescriptor = open(command->stdin, O_RDONLY);
+        if (fileDescriptor < 0) {
+            perror("Error opening file for stdin redirection");
+            return -1; // Return error code instead of exiting
+        }
+        dup2(fileDescriptor, STDIN_FILENO);
+        close(fileDescriptor);
     }
-    else if (descriptor == 1)
-    {
-        fileName = command->stdout;
-        file = open(fileName, O_WRONLY | O_CREAT, 0766);
+ 
+    // Set up redirection for stdout
+    if (command->redirection == 1 && command->stdout != NULL) {
+        fileDescriptor = open(command->stdout, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if (fileDescriptor < 0) {
+            perror("Error opening file for stdout redirection");
+            return -1; // Return error code instead of exiting
+        }
+        dup2(fileDescriptor, STDOUT_FILENO);
+        close(fileDescriptor);
     }
-    else if (descriptor == 2)
-    {
-        fileName = command->stderr;
-        file = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0766);
+ 
+    // Set up redirection for stderr
+    if (command->redirection == 2 && command->stderr != NULL) {
+        fileDescriptor = open(command->stderr, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if (fileDescriptor < 0) {
+            perror("Error opening file for stderr redirection");
+            return -1; // Return error code instead of exiting
+        }
+        dup2(fileDescriptor, STDERR_FILENO);
+        close(fileDescriptor);
     }
-    else
-    {
-        return 1;
-    }
-
-    // Check if file open successfully
-    if (file < 0)
-    {
-        perror("Error opening file");
-        exit(1);
-    }
-    else
-    {
-        dup2(file, descriptor);
-        close(file);
-    }
-
-    if (fileName != NULL)
-    {
-        free(fileName);
-    }
-
+ 
     return 0;
 }
 
