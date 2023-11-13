@@ -27,7 +27,7 @@ extern char *promptName;
 extern Command *commandArray[MAX_COMMANDS];
 extern char *input;
 
-int redirection(Command *command);
+int setRedirection(Command *command);
 void collectChildren();
 void handleSignals();
 void display_history();
