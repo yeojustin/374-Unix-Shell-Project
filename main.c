@@ -2,20 +2,25 @@
 #include "commands.h"
 #include <stdio.h>
 #include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <stdlib.h>
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_ARG_SIZE 100
 
 int main() {
-    char input[MAX_INPUT_SIZE];
+    char *input;
     char *tokens[MAX_ARG_SIZE];
 
     while (1) {
-        printf("myshell> ");
-        if (fgets(input, sizeof(input), stdin) == NULL) {
+        input = readline("myshell> ");
+        if (input == NULL) {
             continue; // Handle EOF
         }
-        input[strcspn(input, "\n")] = 0; // Remove newline character
+        if (*input) {
+            add_history(input); // Add non-empty input to history
+        }
 
         int i = 0;
         tokens[i] = strtok(input, " ");
@@ -38,7 +43,7 @@ int main() {
             }
         }
 
-        add_to_history(input);
+        free(input); // Free the memory allocated by readline
     }
 
     return 0;
